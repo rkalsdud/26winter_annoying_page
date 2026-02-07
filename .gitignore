@@ -1,0 +1,33 @@
+# 가상 환경 (Virtual Environments)
+venv/
+.venv/
+env/
+bin/
+lib/
+include/
+
+# 파이썬 캐시 (Python Byte-compiled)
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# 장고 설정 및 데이터 (Django specific)
+db.sqlite3
+.static_root/
+.media_root/
+staticfiles/
+
+# 민감 정보 (Environment variables / Secrets)
+.env
+.secret
+secrets.json
+
+# IDE 및 OS 관련 (Editors and OS)
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 로그 및 배포 (Logs and static)
+*.log
+local_settings.py
