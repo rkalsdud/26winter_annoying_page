@@ -78,4 +78,70 @@
 
     <a href="{% url 'pybo:question_create' %}" class="btn btn-primary">질문 등록</a>
 </div>
+
+<!-- 커서 발사-->
+
+<div id="game-container" style="position: fixed; bottom: 20px; left: 20px; z-index: 2147483647; pointer-events: none;">
+    <div id="guide-text" style="position: absolute; bottom: 130px; left: -20px; width: 150px; text-align: center; color: #000; font-weight: bold; font-family: sans-serif;">
+        PRESS SPACE BAR
+    </div>
+
+    <div style="position: absolute; bottom: 110px; left: 10px; width: 80px; height: 12px; border: 2px solid #000; display: none; background: #fff; border-radius: 5px; overflow: hidden;">
+        <div id="power-gauge" style="width: 0%; height: 100%; background: linear-gradient(90deg, #ff0, #f00);"></div>
+    </div>
+
+    <div id="cannon-container" style="position: relative; width: 100px; height: 50px; transform-origin: left center; transition: margin-left 0.1s;">
+        <div id="cannon-barrel" style="position: absolute; top: 0; left: 15px; width: 60px; height: 25px; background: #333; border-radius: 5px; border: 1px solid #000;"></div>
+        <div id="cannon-base" style="position: absolute; top: -5px; left: 0; width: 30px; height: 35px; background: #555; border-radius: 50% 10px 10px 50%; border: 1px solid #000;"></div>
+    </div>
+
+    <div id="cursor-bullet" style="
+        position: fixed; 
+        display: none; 
+        width: 40px; 
+        height: 40px; 
+        z-index: 2147483647; 
+        pointer-events: none; 
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 32 32\'><path d=\'M10 2V26L16.2031 20.1875L20 29L23 27.5L19.3125 18.8125L26 18L10 2Z\' fill=\'black\' stroke=\'white\' stroke-width=\'2\'/></svg>');
+        filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+    "></div>
+</div>
+
+<style>
+    /* 불필요한 요소 숨김 */
+    #slingshot, .slingshot, #slingshot-area, #slingshot-old {
+        display: none !important;
+    }
+
+    /* 초기 커서 설정 (!important 제거) */
+    #cursor-bullet { 
+        display: none; 
+    }
+
+    /* 페이지 커서 숨기기 및 클릭 방지 */
+    html, body { cursor: none !important; }
+    /* 실제 링크나 버튼은 pointer-events를 auto로 주지 않으면 자바스크립트의 click()이 동작하지 않을 수 있으므로 주의 */
+    a, button, .page-link { pointer-events: auto; }
+
+    .click-ripple {
+        position: fixed;
+        border: 4px solid #f44336;
+        border-radius: 50%;
+        background: rgba(244, 67, 54, 0.2);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 2147483646;
+        animation: ripple-out 0.6s ease-out;
+    }
+
+    @keyframes ripple-out {
+        from { width: 0; height: 0; opacity: 1; }
+        to { width: 150px; height: 150px; opacity: 0; }
+    }
+</style>
+
+{% load static %}
+<script src="{% static 'slingshot.js' %}"></script>
 {% endblock %}
