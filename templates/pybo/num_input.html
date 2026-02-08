@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-3">
+    <h2 class="border-bottom py-2">잠깐! 숫자를 맞춰야 합니다.</h2>
+    <p class="text-muted">1부터 10 사이의 랜덤 숫자를 맞춰보세요. 틀리면 쫓겨납니다!</p>
+
+    <form action="{% url 'pybo:num_check' question_id %}" method="post" class="mt-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="user_input" class="form-label">정답 입력</label>
+            <input type="number" name="user_input" id="user_input"
+                   class="form-control" min="1" max="10" required>
+        </div>
+        <button type="submit" class="btn btn-primary">운명에 맡기기</button>
+    </form>
+
+    {# 디버그 용도 #}
+    <div class="mt-5 p-3 border border-warning bg-light">
+        <p class="text-danger"><strong>[디버깅 모드]</strong> 현재 세션에 저장된 정답: {{ debug_answer }}</p>
+    </div>
+</div>
+{% endblock %}
