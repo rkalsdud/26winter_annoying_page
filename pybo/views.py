@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 
 import random
+from django.contrib import messages
 
 # Create your views here.
 
@@ -80,4 +81,7 @@ def num_check(request, question_id):
     if str(user_input) == str(correct_answer):
         return redirect('pybo:detail', question_id=question_id)
     else:
-        return redirect('pybo:index')
+        # [추가 기능]
+        # 틀렸을 때 메시지를 보여주고, 3초 후에 질문 목록으로 쫓겨나기
+        messages.error(request, f"정답은 {correct_answer}!")
+        return redirect('pybo:num_input', question_id=question_id)

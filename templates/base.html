@@ -9,11 +9,15 @@
     <title>Pybo</title>
 </head>
 <body>
-{% include 'navbar.html' %}
+    {% include 'navbar.html' %}
 
     {% block content %}
     {% endblock %}
 
-<script src="{% static 'bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'bootstrap.bundle.min.js' %}"></script>
+
+    {# Random-Number #}
+    {% block script %}
+    {% endblock %}
 </body>
 </html>
