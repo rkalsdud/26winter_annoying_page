@@ -2,36 +2,29 @@
 {% load pybo_filter %}
 {% block content %}
 
+<div id="mouse-shield" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2147483645;"></div>
+
 <div class="container my-3">
     <div class="row my-3">
-        <div class="col-6">
+        <div class="col-12">
             <a href="{% url 'pybo:question_create' %}" class="btn btn-primary">질문 등록하기</a>
-        </div>
-        <div class="col-6">
-            <div class="input-group">
-                <input type="text" id="search_kw" class="form-control" value="{{ kw|default_if_none:'' }}">
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
-                </div>
-            </div>
         </div>
     </div>
 
     <table class="table">
-        <thread>
+        <thead>
             <tr class="text-center table-dark">
                 <th>번호</th>
                 <th style="width:50%">제목</th>
                 <th>글쓴이</th>
                 <th>작성일시</th>
             </tr>
-        </thread>
+        </thead>
         <tbody>
             {% if question_list %}
             {% for question in question_list %}
                 <tr class="text-center">
                     <td>
-                    <!-- 번호 = 전체건수 - 시작인덱스 - 현재인덱스 + 1 -->
                         {{ question_list.paginator.count|sub:question_list.start_index|sub:forloop.counter0|add:1 }}
                     </td>
                     <td class="text-start">
@@ -40,8 +33,7 @@
                         <span class="text-danger small mx-2">{{ question.answer_set.count }}</span>
                         {% endif %}
                     </td>
-                    <td>{{ question.author.username }}</td>  <!-- 글쓴이 추가 -->
-                    <td>{{ question.create_date }}</td>
+                    <td>{{ question.author.username }}</td>  <td>{{ question.create_date }}</td>
                 </tr>
                 {% endfor %}
                 {% else %}
@@ -51,50 +43,50 @@
             {% endif %}
         </tbody>
     </table>
-<!-- 페이징처리 시작 -->
+
 <ul class="pagination justify-content-center">
-    <!-- 이전페이지 -->
     {% if question_list.has_previous %}
     <li class="page-item">
-        <a class="page-link" data-page="{{ question_list.previous_page_number }}"
-           href="javascript:void(0)">이전</a>
+        <a class="page-link" data-page="{{ question_list.previous_page_number }}" href="javascript:void(0)">이전</a>
     </li>
     {% else %}
     <li class="page-item disabled">
-        <a class="page-link" tabindex="-1" aria-disabled="true"
-           href="javascript:void(0)">이전</a>
+        <a class="page-link" tabindex="-1" aria-disabled="true" href="javascript:void(0)">이전</a>
     </li>
     {% endif %}
-    <!-- 페이지리스트 -->
     {% for page_number in question_list.paginator.page_range %}
     {% if page_number >= question_list.number|add:-5 and page_number <= question_list.number|add:5 %}
     {% if page_number == question_list.number %}
     <li class="page-item active" aria-current="page">
-        <a class="page-link" data-page="{{ page_number }}"
-           href="javascript:void(0)">{{ page_number }}</a>
+        <a class="page-link" data-page="{{ page_number }}" href="javascript:void(0)">{{ page_number }}</a>
     </li>
     {% else %}
     <li class="page-item">
-        <a class="page-link" data-page="{{ page_number }}"
-           href="javascript:void(0)">{{ page_number }}</a>
+        <a class="page-link" data-page="{{ page_number }}" href="javascript:void(0)">{{ page_number }}</a>
     </li>
     {% endif %}
     {% endif %}
     {% endfor %}
-    <!-- 다음페이지 -->
     {% if question_list.has_next %}
     <li class="page-item">
-        <a class="page-link" data-page="{{ question_list.next_page_number }}"
-           href="javascript:void(0)">다음</a>
+        <a class="page-link" data-page="{{ question_list.next_page_number }}" href="javascript:void(0)">다음</a>
     </li>
     {% else %}
     <li class="page-item disabled">
-        <a class="page-link" tabindex="-1" aria-disabled="true"
-           href="javascript:void(0)">다음</a>
+        <a class="page-link" tabindex="-1" aria-disabled="true" href="javascript:void(0)">다음</a>
     </li>
     {% endif %}
 </ul>
-<!-- 페이징처리 끝 -->
+<div class="row my-3 justify-content-center">
+    <div class="col-8 col-md-6">
+        <div class="input-group">
+            <input type="text" id="search_kw" class="form-control" value="{{ kw|default_if_none:'' }}">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </div>
 
@@ -113,11 +105,82 @@ Array.from(page_elements).forEach(function(element) {
         document.getElementById('searchForm').submit();
     });
 });
+
 const btn_search = document.getElementById("btn_search");
 btn_search.addEventListener('click', function() {
     document.getElementById('kw').value = document.getElementById('search_kw').value;
     document.getElementById('page').value = 1;  // 검색버튼을 클릭할 경우 1페이지부터 조회한다.
     document.getElementById('searchForm').submit();
 });
+
+// 엔터키를 눌렀을 때 검색이 실행되도록 추가
+const search_kw = document.getElementById("search_kw");
+search_kw.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        e.preventDefault(); // 기본 폼 제출 방지
+        btn_search.click(); // 찾기 버튼 클릭 이벤트 강제 발생
+    }
+});
 </script>
+
+<div id="game-container" style="position: fixed; bottom: 20px; left: 20px; z-index: 2147483647; pointer-events: none;">
+    <div id="guide-text" style="position: absolute; bottom: 130px; left: -20px; width: 150px; text-align: center; color: #000; font-weight: bold; font-family: sans-serif;">
+        PRESS SPACE BAR
+    </div>
+
+    <div style="position: absolute; bottom: 110px; left: 10px; width: 80px; height: 12px; border: 2px solid #000; display: none; background: #fff; border-radius: 5px; overflow: hidden;">
+        <div id="power-gauge" style="width: 0%; height: 100%; background: linear-gradient(90deg, #ff0, #f00);"></div>
+    </div>
+
+    <div id="cannon-container" style="position: relative; width: 100px; height: 50px; transform-origin: left center; transition: margin-left 0.1s;">
+        <div id="cannon-barrel" style="position: absolute; top: 0; left: 15px; width: 60px; height: 25px; background: #333; border-radius: 5px; border: 1px solid #000;"></div>
+        <div id="cannon-base" style="position: absolute; top: -5px; left: 0; width: 30px; height: 35px; background: #555; border-radius: 50% 10px 10px 50%; border: 1px solid #000;"></div>
+    </div>
+
+    <div id="cursor-bullet" style="
+        position: fixed; 
+        display: none; 
+        width: 40px; 
+        height: 40px; 
+        z-index: 2147483647; 
+        pointer-events: none; 
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 32 32\'><path d=\'M10 2V26L16.2031 20.1875L20 29L23 27.5L19.3125 18.8125L26 18L10 2Z\' fill=\'black\' stroke=\'white\' stroke-width=\'2\'/></svg>');
+        filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+    "></div>
+</div>
+
+<style>
+    /* 불필요한 요소 숨김 */
+    #slingshot, .slingshot, #slingshot-area, #slingshot-old {
+        display: none !important;
+    }
+
+    #cursor-bullet { 
+        display: none; 
+    }
+
+    /* 페이지 전체의 마우스 커서 숨김 */
+    * { cursor: none !important; }
+
+    .click-ripple {
+        position: fixed;
+        border: 4px solid #f44336;
+        border-radius: 50%;
+        background: rgba(244, 67, 54, 0.2);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 2147483646;
+        animation: ripple-out 0.6s ease-out;
+    }
+
+    @keyframes ripple-out {
+        from { width: 0; height: 0; opacity: 1; }
+        to { width: 150px; height: 150px; opacity: 0; }
+    }
+</style>
+
+{% load static %}
+<script src="{% static 'slingshot.js' %}"></script>
 {% endblock %}
