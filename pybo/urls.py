@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import base_views, question_views, answer_views
+from .views import base_views, question_views, answer_views, random_views
 
 app_name = 'pybo'
 
@@ -30,4 +30,8 @@ urlpatterns = [
          answer_views.answer_delete, name='answer_delete'),
     path('answer/vote/<int:answer_id>/',
          answer_views.answer_vote, name='answer_vote'),
+    
+     # Random-Number function
+    path('num_input/<int:question_id>', random_views.num_input, name='num_input'), # 숫자 입력
+    path('num_check/<int:question_id>', random_views.num_check, name='num_check'), # 입력한 숫자와 정답 비교
 ]
