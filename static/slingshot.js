@@ -16,6 +16,16 @@ const gravity = 0.5;
 let vx = 0, vy = 0, posX = 0, posY = 0;
 
 document.addEventListener('keydown', function(e) {
+    const active = document.activeElement;
+    
+    // 입력창 활성화 상태일 때의 예외 처리
+    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
+        if (e.key === 'Escape') {
+            active.blur();
+        }
+        return; 
+    }
+
     if (e.code === 'Space') {
         if (isFlying) {
             triggerAirClick();
@@ -40,6 +50,11 @@ document.addEventListener('keydown', function(e) {
 });
 
 document.addEventListener('keyup', function(e) {
+    const active = document.activeElement;
+    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
+        return;
+    }
+
     if (e.code === 'Space' && isCharging) {
         launch();
     }
@@ -74,15 +89,13 @@ function launch() {
     setTimeout(() => { cannonContainer.style.marginLeft = '0px'; }, 100);
     powerGauge.parentElement.style.display = 'none';
 
-    // 시작 좌표: 대포 위치 근처
-    posX = 100;
-    posY = window.innerHeight - 150;
+    posX = 60;
+    posY = window.innerHeight - 80;
     
-    const speed = 10 + (chargePower / 5); 
+    const speed = 15 + (chargePower / 4); 
     vx = speed * Math.cos(angle * Math.PI / 180);
     vy = -speed * Math.sin(angle * Math.PI / 180);
 
-    // 가시성 강제 부여
     bullet.style.display = 'block';
     bullet.style.opacity = '1';
     bullet.style.visibility = 'visible';
@@ -109,56 +122,53 @@ function animate() {
     }
 }
 
+// === 클릭 판정 범위가 엄격해진 트리거 함수 ===
 function triggerAirClick() {
     isFlying = false;
     cancelAnimationFrame(animationId);
     
-    createRipple(posX, posY);
+    const hitX = posX + 15;
+    const hitY = posY + 15;
+    
+    createRipple(hitX, hitY);
 
-    // 1. 클릭 감지 반경 설정 (픽셀 단위)
-    const clickRadius = 30; 
-    let target = null;
+    const shield = document.getElementById('mouse-shield');
+    if (shield) shield.style.display = 'none';
 
-    // 2. 중심점에서 가장 먼저 잡히는 요소 확인
-    target = document.elementFromPoint(posX, posY);
-
-    // 3. 만약 중심점에 아무것도 없거나 일반 배경(body/html)이라면 주변 탐색
-    if (!target || target === document.body || target === document.documentElement) {
-        // 8방향으로 범위를 넓혀가며 클릭 가능한 요소(a, button)가 있는지 확인
-        const checkPoints = [
-            [posX + clickRadius, posY], [posX - clickRadius, posY],
-            [posX, posY + clickRadius], [posX, posY - clickRadius],
-            [posX + clickRadius/1.4, posY + clickRadius/1.4],
-            [posX - clickRadius/1.4, posY - clickRadius/1.4]
-        ];
-
-        for (const [px, py] of checkPoints) {
-            const tempTarget = document.elementFromPoint(px, py);
-            if (tempTarget && (tempTarget.closest('a') || tempTarget.closest('button'))) {
-                target = tempTarget;
-                break; // 클릭 가능한 요소를 찾으면 중단
+    const target = document.elementFromPoint(hitX, hitY);
+    if (target) {
+        // 1. 맞춘 위치 자체가 링크/버튼이거나, 바로 위 부모가 링크/버튼인지 확인
+        let link = target.closest('a') || target.closest('button');
+        
+        // 2. 만약 표의 칸(TD)이나 리스트(LI) 같은 '좁은 영역'을 맞췄을 때만 그 내부의 링크를 검색
+        if (!link && ['TD', 'TH', 'LI', 'SPAN'].includes(target.tagName)) {
+            link = target.querySelector('a') || target.querySelector('button');
+        }
+        
+        // 3. 요소 판별 및 실행
+        if (link) {
+            // 링크나 버튼을 찾았다면 해당 요소를 클릭
+            link.click();
+        } else if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+            // 입력창을 맞췄다면 타이핑 가능하게 포커스
+            target.focus();
+        } else {
+            // 빈 공간이나 일반 텍스트 등을 맞췄을 때
+            // 활성화된 입력창이 있다면 빠져나오게(blur)만 처리하고 아무것도 클릭하지 않음
+            const active = document.activeElement;
+            if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
+                active.blur();
             }
         }
     }
-
-    // 4. 최종 타겟 클릭 수행
-    if (target) {
-        const clickable = target.closest('a') || target.closest('button') || target;
-        
-        // 시각적 피드백을 위해 잠시 스타일 변경 (선택 사항)
-        if (clickable.style) {
-            const originalBg = clickable.style.backgroundColor;
-            clickable.style.backgroundColor = 'rgba(255, 255, 0, 0.5)';
-            setTimeout(() => { clickable.style.backgroundColor = originalBg; }, 100);
-        }
-
-        clickable.click();
-    }
     
+    if (shield) shield.style.display = 'block';
+
     setTimeout(() => {
         resetBullet();
     }, 200);
 }
+
 function createRipple(x, y) {
     const ripple = document.createElement('div');
     ripple.className = 'click-ripple';
@@ -176,3 +186,5 @@ function resetBullet() {
     guideText.style.display = 'block';
     updateCannon();
 }
+
+updateCannon();
