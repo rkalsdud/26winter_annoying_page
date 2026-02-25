@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container d-flex flex-column align-items-center justify-content-center" style="height: 80vh;">
+    <h2 id="status-message" class="mb-4 fw-bold text-primary">페이지를 생성하는 중...</h2>
+
+    <div class="progress w-75 mb-3" style="height: 30px; border-radius: 15px;">
+        <div id="progress-bar"
+             class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+             role="progressbar"
+             style="width: 0%;"
+             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        </div>
+    </div>
+
+    <p class="text-muted"><span id="percent" class="fw-bold text-dark">0</span>% 완료</p>
+
+    <button id="continue-btn"
+            class="btn btn-primary btn-lg mt-3 shadow"
+            style="display: none;"
+            onclick="location.href='/'">
+        진행하기 <i class="bi bi-arrow-right-circle"></i>
+    </button>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+  let progress = 0;
+  const progressBar = document.getElementById('progress-bar');
+  const percentText = document.getElementById('percent');
+  const continueBtn = document.getElementById('continue-btn');
+  const statusMessage = document.getElementById('status-message');
+
+  function updateProgress() {
+      if (progress < 100) {
+          // 여기에 '짜증' 포인트를 줄 수 있습니다.
+          // 예를 들어 90%에서 아주 느려지게 만든다거나요.
+          let increment = Math.random() * 5; // 무작위로 상승
+          progress += increment;
+
+          if (progress > 100) progress = 100;
+
+          progressBar.style.width = progress + '%';
+          percentText.innerText = Math.floor(progress);
+
+          // 로딩 속도를 조절 (작을수록 빠름)
+          setTimeout(updateProgress, 200);
+      } else {
+          // 로딩 완료 시
+          statusMessage.innerText = "로딩 완료! (드디어)";
+          continueBtn.style.display = 'block'; // 버튼 등장
+      }
+  }
+
+  // 페이지 로드 후 바로 시작
+  window.onload = updateProgress;
+</script>
+{% endblock %}
