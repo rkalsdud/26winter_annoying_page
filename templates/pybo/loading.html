@@ -10,12 +10,20 @@
             로딩 중...
         </h2>
 
-        <!-- 리셋(함정) 버튼 -->
+        <!-- 함정 버튼 1 - 리셋 버튼 -->
         <button id="reset-btn"
-                class="btn btn-success position-absolute w-75"
+                class="btn btn-warning position-absolute w-75 text-white fw-bold rounded-pill"
                 style="display:none;"
                 onclick="resetProgress()">
                 스킵
+        </button>
+
+        <!-- 함정 버튼 2 - 처음부터 버튼 -->
+        <button id="first-btn"
+                class="btn btn-danger position-absolute w-75 text-white fw-bold rounded-pill"
+                style="display:none"
+                onclick="firstProgress()">
+                처음부터
         </button>
     </div>
 
@@ -34,8 +42,8 @@
 
     <!-- 진행하기 버튼 -->
     <button id="continue-btn"
-            class="btn btn-primary btn-lg mt-3 shadow"
-            style="display: none;"
+            class="btn btn-primary btn-lg text-white fw-bold rounded-pill"
+            style="display: none; border-radius: 15px"
             onclick="location.href='{% url 'pybo:detail' question_id %}'">
             진행하기 <i class="bi bi-arrow-right-circle"></i>
     </button>
@@ -51,14 +59,21 @@
     const percentText = document.getElementById('percent');
     const continueBtn = document.getElementById('continue-btn');
 
-    // 리셋(함정) 버튼
+    // 함정 버튼
     const resetBtn = document.getElementById('reset-btn');
+    const firstBtn = document.getElementById('first-btn');
 
     function updateProgress() {
         if (progress < 100) { // 로딩 중
             if (progress >= 50) {
                 statusMessage.style.transform = "translateY(-50px)";
                 resetBtn.style.display = "block";
+            }
+
+            if (progress >= 80) {
+                statusMessage.style.transform = "translateY(-100px)";
+                firstBtn.style.transform = "translateY(-50px)";
+                firstBtn.style.display = "block";
             }
 
             let increment = Math.random() * 5;
@@ -70,7 +85,14 @@
             percentText.innerText = Math.floor(progress);
         }
         else { // 로딩 완료 시
+            statusMessage.style.transform = "translateY(0px)";
+
             statusMessage.innerText = "로딩 완료!";
+            statusMessage.classList.remove('text-warning', 'text-danger');
+            statusMessage.classList.add('text-primary', 'fw-bold');
+
+            resetBtn.style.display = 'none';
+            firstBtn.style.display = 'none';
             continueBtn.style.display = 'block'; // 버튼 등장
         }
     }
@@ -81,11 +103,31 @@
         progressBar.style.width = progress + '%';
         percentText.innerText = Math.floor(progress);
 
+        // 경고 메세지 변경
         statusMessage.style.transform = "translateY(0px)";
         statusMessage.innerText = "유감입니다! 처음부터 다시 시작해주세요."
-        resetBtn.style.display = "none";
+        statusMessage.classList.remove('text-primary', 'text-danger');
+        statusMessage.classList.add('text-warning');
 
+        resetBtn.style.display = "none";
+        firstBtn.style.display = "none";
         continueBtn.style.display = 'none';
+    }
+
+    function firstProgress() {
+        // 클릭 이벤트 차단
+        document.body.style.cursor = 'none';
+        document.body.style.pointerEvents = 'none';
+
+        // 경고 메시지 변경
+        statusMessage.innerText = "두 번 속으셨네요. 처음으로 되돌아갑니다.";
+        statusMessage.classList.remove('text-primary', 'text-warning');
+        statusMessage.classList.add('text-danger');
+
+        // 3초 후 질문 목록으로 강제 이동
+        setTimeout(function() {
+            location.href = "{% url 'pybo:index' %}"
+        }, 3000);
     }
 
     // statusMessage 클릭 시 함수(게이지 상승) 실행
