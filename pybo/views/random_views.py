@@ -25,9 +25,10 @@ def num_check(request, question_id):
     user_input = request.POST.get('user_input')
     correct_answer = request.session.get('num_answer')
 
-    # 2. 두 숫자 비교 후 정답이면 상세 페이지, 오답이면 메인 리스트로 이동
+    # [Manual-Loading]
+    # 2. 두 숫자 비교 후 정답이면 로딩 페이지, 오답이면 메인 리스트로 이동
     if str(user_input) == str(correct_answer):
-        return redirect('pybo:detail', question_id=question_id)
+        return redirect('pybo:loading', question_id=question_id)
     else:
         # [추가 기능]
         # 틀렸을 때 메시지를 보여주고, 3초 후에 질문 목록으로 쫓겨나기

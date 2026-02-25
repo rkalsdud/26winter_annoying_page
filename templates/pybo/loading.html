@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container d-flex flex-column align-items-center justify-content-center" style="height: 80vh;">
-    <h2 id="status-message" class="mb-4 fw-bold text-primary">페이지를 생성하는 중...</h2>
+    <!-- 로딩 중 텍스트 -->
+    <h2 id="status-message" class="mb-4 fw-bold text-primary user-select-none" style="cursor: pointer;">로딩 중...</h2>
 
+    <!-- 로딩 바 -->
     <div class="progress w-75 mb-3" style="height: 30px; border-radius: 15px;">
         <div id="progress-bar"
              class="progress-bar progress-bar-striped progress-bar-animated bg-success"
@@ -12,12 +14,14 @@
         </div>
     </div>
 
+    <!-- 로딩 퍼센트 텍스트 -->
     <p class="text-muted"><span id="percent" class="fw-bold text-dark">0</span>% 완료</p>
 
+    <!-- 진행하기 버튼 -->
     <button id="continue-btn"
             class="btn btn-primary btn-lg mt-3 shadow"
             style="display: none;"
-            onclick="location.href='/'">
+            onclick="location.href='{% url 'pybo:detail' question_id %}'">
         진행하기 <i class="bi bi-arrow-right-circle"></i>
     </button>
 </div>
@@ -25,34 +29,30 @@
 
 {% block script %}
 <script>
-  let progress = 0;
-  const progressBar = document.getElementById('progress-bar');
-  const percentText = document.getElementById('percent');
-  const continueBtn = document.getElementById('continue-btn');
-  const statusMessage = document.getElementById('status-message');
+    let progress = 0;
+    const statusMessage = document.getElementById('status-message');
+    const progressBar = document.getElementById('progress-bar');
+    const percentText = document.getElementById('percent');
+    const continueBtn = document.getElementById('continue-btn');
 
-  function updateProgress() {
-      if (progress < 100) {
-          // 여기에 '짜증' 포인트를 줄 수 있습니다.
-          // 예를 들어 90%에서 아주 느려지게 만든다거나요.
-          let increment = Math.random() * 5; // 무작위로 상승
+    function updateProgress() {
+        if (progress < 100) { // 로딩 중
+          let increment = Math.random() * 5;
           progress += increment;
 
           if (progress > 100) progress = 100;
 
           progressBar.style.width = progress + '%';
           percentText.innerText = Math.floor(progress);
+        }
+        else { // 로딩 완료 시
 
-          // 로딩 속도를 조절 (작을수록 빠름)
-          setTimeout(updateProgress, 200);
-      } else {
-          // 로딩 완료 시
-          statusMessage.innerText = "로딩 완료! (드디어)";
+          statusMessage.innerText = "로딩 완료!";
           continueBtn.style.display = 'block'; // 버튼 등장
-      }
-  }
+        }
+    }
 
-  // 페이지 로드 후 바로 시작
-  window.onload = updateProgress;
+    // statusMessage 클릭 시 함수(게이지 상승) 실행
+    statusMessage.addEventListener('click', updateProgress);
 </script>
 {% endblock %}
