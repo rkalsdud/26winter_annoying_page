@@ -1,8 +1,23 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container d-flex flex-column align-items-center justify-content-center" style="height: 80vh;">
-    <!-- 로딩 중 텍스트 -->
-    <h2 id="status-message" class="mb-4 fw-bold text-primary user-select-none" style="cursor: pointer;">로딩 중...</h2>
+
+    <div class="position-relative d-flex justify-content-center align-items-center" style="height: 80px; width: 100%;">
+        <!-- 로딩 중 텍스트 -->
+        <h2 id="status-message"
+            class="fw-bold text-primary user-select-none position-absolute"
+            style="cursor: pointer">
+            로딩 중...
+        </h2>
+
+        <!-- 리셋(함정) 버튼 -->
+        <button id="reset-btn"
+                class="btn btn-success position-absolute w-75"
+                style="display:none;"
+                onclick="resetProgress()">
+                스킵
+        </button>
+    </div>
 
     <!-- 로딩 바 -->
     <div class="progress w-75 mb-3" style="height: 30px; border-radius: 15px;">
@@ -22,34 +37,55 @@
             class="btn btn-primary btn-lg mt-3 shadow"
             style="display: none;"
             onclick="location.href='{% url 'pybo:detail' question_id %}'">
-        진행하기 <i class="bi bi-arrow-right-circle"></i>
+            진행하기 <i class="bi bi-arrow-right-circle"></i>
     </button>
 </div>
 {% endblock %}
 
 {% block script %}
 <script>
+    // 기본 기능 : "로딩 중" 텍스트 클릭 시 게이지 상승
     let progress = 0;
     const statusMessage = document.getElementById('status-message');
     const progressBar = document.getElementById('progress-bar');
     const percentText = document.getElementById('percent');
     const continueBtn = document.getElementById('continue-btn');
 
+    // 리셋(함정) 버튼
+    const resetBtn = document.getElementById('reset-btn');
+
     function updateProgress() {
         if (progress < 100) { // 로딩 중
-          let increment = Math.random() * 5;
-          progress += increment;
+            if (progress >= 50) {
+                statusMessage.style.transform = "translateY(-50px)";
+                resetBtn.style.display = "block";
+            }
 
-          if (progress > 100) progress = 100;
+            let increment = Math.random() * 5;
+            progress += increment;
 
-          progressBar.style.width = progress + '%';
-          percentText.innerText = Math.floor(progress);
+            if (progress > 100) progress = 100;
+
+            progressBar.style.width = progress + '%';
+            percentText.innerText = Math.floor(progress);
         }
         else { // 로딩 완료 시
-
-          statusMessage.innerText = "로딩 완료!";
-          continueBtn.style.display = 'block'; // 버튼 등장
+            statusMessage.innerText = "로딩 완료!";
+            continueBtn.style.display = 'block'; // 버튼 등장
         }
+    }
+
+    function resetProgress() {
+        progress = 0;
+
+        progressBar.style.width = progress + '%';
+        percentText.innerText = Math.floor(progress);
+
+        statusMessage.style.transform = "translateY(0px)";
+        statusMessage.innerText = "유감입니다! 처음부터 다시 시작해주세요."
+        resetBtn.style.display = "none";
+
+        continueBtn.style.display = 'none';
     }
 
     // statusMessage 클릭 시 함수(게이지 상승) 실행
