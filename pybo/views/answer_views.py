@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect, resolve_url
 from django.utils import timezone
 
-from ..forms import AnswerForm
+from ..forms import AnswerForm, CommentForm
 from ..models import Question, Answer
 
 @login_required(login_url='common:login')
@@ -58,3 +58,4 @@ def answer_vote(request, answer_id):
     else:
         answer.voter.add(request.user)
     return redirect('{}#answer_{}'.format(resolve_url('pybo:detail', question_id=answer.question.id), answer.id))
+
