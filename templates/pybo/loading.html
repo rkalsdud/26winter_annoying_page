@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container d-flex flex-column align-items-center justify-content-center" style="height: 80vh;">
+
+    <div class="position-relative d-flex justify-content-center align-items-center" style="height: 80px; width: 100%;">
+        <!-- 로딩 중 텍스트 -->
+        <h2 id="status-message"
+            class="fw-bold text-primary user-select-none position-absolute"
+            style="cursor: pointer">
+            로딩 중...
+        </h2>
+
+        <!-- 함정 버튼 1 - 리셋 버튼 -->
+        <button id="reset-btn"
+                class="btn btn-warning position-absolute w-75 text-white fw-bold rounded-pill"
+                style="display:none;"
+                onclick="resetProgress()">
+                스킵
+        </button>
+
+        <!-- 함정 버튼 2 - 처음부터 버튼 -->
+        <button id="first-btn"
+                class="btn btn-danger position-absolute w-75 text-white fw-bold rounded-pill"
+                style="display:none"
+                onclick="firstProgress()">
+                처음부터
+        </button>
+    </div>
+
+    <!-- 로딩 바 -->
+    <div class="progress w-75 mb-3" style="height: 30px; border-radius: 15px;">
+        <div id="progress-bar"
+             class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+             role="progressbar"
+             style="width: 0%;"
+             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        </div>
+    </div>
+
+    <!-- 로딩 퍼센트 텍스트 -->
+    <p class="text-muted"><span id="percent" class="fw-bold text-dark">0</span>% 완료</p>
+
+    <!-- 진행하기 버튼 -->
+    <button id="continue-btn"
+            class="btn btn-primary btn-lg text-white fw-bold rounded-pill"
+            style="display: none; border-radius: 15px"
+            onclick="location.href='{% url 'pybo:detail' question_id %}'">
+            진행하기 <i class="bi bi-arrow-right-circle"></i>
+    </button>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    // 기본 기능 : "로딩 중" 텍스트 클릭 시 게이지 상승
+    let progress = 0;
+    const statusMessage = document.getElementById('status-message');
+    const progressBar = document.getElementById('progress-bar');
+    const percentText = document.getElementById('percent');
+    const continueBtn = document.getElementById('continue-btn');
+
+    // 함정 버튼
+    const resetBtn = document.getElementById('reset-btn');
+    const firstBtn = document.getElementById('first-btn');
+
+    function updateProgress() {
+        if (progress < 100) { // 로딩 중
+            if (progress >= 50) {
+                statusMessage.style.transform = "translateY(-50px)";
+                resetBtn.style.display = "block";
+            }
+
+            if (progress >= 80) {
+                statusMessage.style.transform = "translateY(-100px)";
+                firstBtn.style.transform = "translateY(-50px)";
+                firstBtn.style.display = "block";
+            }
+
+            let increment = Math.random() * 5;
+            progress += increment;
+
+            if (progress > 100) progress = 100;
+
+            progressBar.style.width = progress + '%';
+            percentText.innerText = Math.floor(progress);
+        }
+        else { // 로딩 완료 시
+            statusMessage.style.transform = "translateY(0px)";
+
+            statusMessage.innerText = "로딩 완료!";
+            statusMessage.classList.remove('text-warning', 'text-danger');
+            statusMessage.classList.add('text-primary', 'fw-bold');
+
+            resetBtn.style.display = 'none';
+            firstBtn.style.display = 'none';
+            continueBtn.style.display = 'block'; // 버튼 등장
+        }
+    }
+
+    function resetProgress() {
+        progress = 0;
+
+        progressBar.style.width = progress + '%';
+        percentText.innerText = Math.floor(progress);
+
+        // 경고 메세지 변경
+        statusMessage.style.transform = "translateY(0px)";
+        statusMessage.innerText = "유감입니다! 처음부터 다시 시작해주세요."
+        statusMessage.classList.remove('text-primary', 'text-danger');
+        statusMessage.classList.add('text-warning');
+
+        resetBtn.style.display = "none";
+        firstBtn.style.display = "none";
+        continueBtn.style.display = 'none';
+    }
+
+    function firstProgress() {
+        // 클릭 이벤트 차단
+        document.body.style.cursor = 'none';
+        document.body.style.pointerEvents = 'none';
+
+        // 경고 메시지 변경
+        statusMessage.innerText = "두 번 속으셨네요. 처음으로 되돌아갑니다.";
+        statusMessage.classList.remove('text-primary', 'text-warning');
+        statusMessage.classList.add('text-danger');
+
+        // 3초 후 질문 목록으로 강제 이동
+        setTimeout(function() {
+            location.href = "{% url 'pybo:index' %}"
+        }, 3000);
+    }
+
+    // statusMessage 클릭 시 함수(게이지 상승) 실행
+    statusMessage.addEventListener('click', updateProgress);
+</script>
+{% endblock %}
