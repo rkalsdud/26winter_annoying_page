@@ -10,6 +10,15 @@
             <a href="{% url 'pybo:question_create' %}" class="btn btn-primary">질문 등록하기</a>
         </div>
     </div>
+    <div class="row my-3">
+
+        <div class="col-12">
+            <div class="btn-group" role="group" aria-label="Sorting options">
+                <a href="{% url 'pybo:index' %}?{% if kw %}kw={{ kw }}&{% endif %}so=recent" class="btn btn-outline-secondary {% if so == 'recent' %}active{% endif %}">최신순</a>
+                <a href="{% url 'pybo:index' %}?{% if kw %}kw={{ kw }}&{% endif %}so=recommend" class="btn btn-outline-secondary {% if so == 'recommend' %}active{% endif %}">추천순</a>
+                <a href="{% url 'pybo:index' %}?{% if kw %}kw={{ kw }}&{% endif %}so=reverse" class="btn btn-outline-secondary {% if so == 'reverse' %}active{% endif %}">오래된 순</a>
+            </div>
+        </div>
 
     <table class="table">
         <thead>
@@ -92,9 +101,10 @@
 
 </div>
 
-<form id="searchForm" method="get" action="{% url 'index' %}">
+<form id="searchForm" method="get" action="{% url 'pybo:index' %}">
     <input type="hidden" id="kw" name="kw" value="{{ kw|default_if_none:'' }}">
     <input type="hidden" id="page" name="page" value="{{ page }}">
+    <input type="hidden" id="so" name="so" value="{{ so|default_if_none:'recent' }}">
 </form>
 {% endblock %}
 

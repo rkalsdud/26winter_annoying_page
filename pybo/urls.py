@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import base_views, question_views, answer_views, random_views, loading_views
+from .views import base_views, question_views, answer_views, random_views, loading_views, comment_views
 
 app_name = 'pybo'
 
@@ -30,6 +30,14 @@ urlpatterns = [
          answer_views.answer_delete, name='answer_delete'),
     path('answer/vote/<int:answer_id>/',
          answer_views.answer_vote, name='answer_vote'),
+    
+    # comment_views.py
+     path('comment/create/<int:answer_id>/',
+         comment_views.comment_create, name='comment_create'),
+     path('comment/modify/<int:comment_id>/',
+           comment_views.comment_modify, name='comment_modify'),
+     path('comment/delete/<int:comment_id>/',
+          comment_views.comment_delete, name='comment_delete'),
     
      # Random-Number function
     path('num_input/<int:question_id>/', random_views.num_input, name='num_input'), # 숫자 입력
